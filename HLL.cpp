@@ -59,7 +59,7 @@ int HLL::get_uniq_num() const
 
 HLL::HLL(double error) : m_error(error)
 {
-    _m = 1.04 / m_error;
+    _m = 1.04 / m_error * _boost_m;
     _k = static_cast<int>(ceil(std::log2(_m * _m)));
     _k_comp = 32 - _k;
     _m = 1 << _k;

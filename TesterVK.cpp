@@ -28,6 +28,8 @@ int main() {
         printf("%d numbers in range [1 .. %d], %d uniq, %d result, %.5f relative error\n", N, k, expected, counter_result, error);
         assert(error <= 0.1);
     }
+    HLL counter(0.067);
+    printf("%.5f size in kb\n", double(sizeof(counter)) / 1024);
 
     return 0;
 }

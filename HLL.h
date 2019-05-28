@@ -27,6 +27,7 @@ private:
     int _k;
     int _k_comp;
     double _alpha_m;
+    int _boost_m = 200;
     size_t pow_2_32 = 0xFFFFFFFF + 1;
     std::vector<int> _M;
 
