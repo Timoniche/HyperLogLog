@@ -1,13 +1,20 @@
 #include "HLL.h"
 #include <cmath>
 
+#include <cstddef>
+#include <random>
+#include <limits>
+#include <vector>
+#include <thread>
+#include <functional>
+
 //______________________________________________________________________________________________________________________
 int HLL::random_int()
 {
     return int_dist(gen);
 }
 
-int HLL::rank(unsigned int hash, int max)
+int HLL::first_zeros_less_max(unsigned int hash, int max)
 {
     int r = 1;
     while ((hash & 1) == 0 && r <= max)
@@ -23,7 +30,32 @@ void HLL::add(int x)
 {
     unsigned int hash = FNV::count_element(x);
     int j = hash >> _k_comp;
-    _M[j] = std::max(_M[j], rank(hash, _k_comp));
+    _M[j] = std::max(_M[j], first_zeros_less_max(hash, _k_comp));
+}
+
+void HLL::add_data(std::vector<int> &data)
+{
+    int size_of_block = data.size() / THREADS_NUMBER;
+    for (int i = 0; i < THREADS_NUMBER - 1; i++)
+    {
+        threads[i] = std::thread(&HLL::analyse_portion, this, std::ref(data), i * size_of_block, (i + 1) * size_of_block + 1);
+    }
+    int last_index = THREADS_NUMBER - 1;
+    threads[last_index] = std::thread(&HLL::analyse_portion, this, std::ref(data), last_index * size_of_block,
+                                      data.size());
+
+    for (auto &thread : threads)
+    {
+        thread.join();
+    }
+}
+
+void HLL::analyse_portion(const std::vector<int> &data, size_t begin, size_t end)
+{
+    for (size_t i = begin; i < end; i++)
+    {
+        add(data[i]);
+    }
 }
 
 int HLL::get_uniq_num() const
